@@ -2,52 +2,52 @@ import React, { useEffect, useState } from "react";
 
 const SearchInput = () => {
   const [data, setData] = useState([]);
-  const [query, setQuery] = useState("");
+  const [search, setSearch] = useState("");
 
-  const getData = async () => {
+  const getdata = async (search) => {
     try {
       const res = await fetch(
-        `https://dummyjson.com/products/search?q=${query}`,
+        `https://dummyjson.com/recipes/search?q=${search}`,
       );
-
-      if (!res.ok) {
-        throw new Error("Failed to fecth data");
-      }
-
-      const result = await res.json();
-      setData(result.products);
-      console.log(result);
+      const data = await res.json();
+      setData(data.recipes);
+      console.log(data.recipes);
     } catch (error) {
-      console.log("Error:", error);
+      console.log("Failed to fetch data", error);
     }
   };
 
-  useEffect(() => {
-    if (!query) {
-      setData([])
-      return
-    }
+ useEffect(() => {
+  if (search.trim() === "") {
+    setData([]);
+    return;
+  }
 
-    const timer=setTimeout(()=>{
-         getData()
-    },500)
+  const ref = setTimeout(() => {
+    getdata(search);
+  }, 500);
 
-    return ()=>clearTimeout(timer)
-  }, [query]);
+  return () => clearTimeout(ref); // ✅ correct cleanup
+}, [search]);
+
 
   return (
-    <div className="w-96 flex flex-col items-center justify-center">
-      <input
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        className="border-2 px-5 py-2 w- w-full rounded-md border-blue-800"
-        type="text"
-      />
-      <div className="mt-4 h-[300px] overflow-y-auto">
-        {data?.map((t) => (
-          <div key={t.id}>{t.title}</div>
-        ))}
+    <div className="w-[500px] flex flex-col gap-5 border">
+      <div>
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          type="text"
+        />
       </div>
+      <ul>
+        {data.length > 0 &&
+          data.map((t) => (
+            <div key={t.id}>
+              <p>{t.name}</p>
+            </div>
+          ))}
+      </ul>
     </div>
   );
 };
