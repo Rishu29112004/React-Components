@@ -17,24 +17,25 @@ const SearchInput = () => {
     }
   };
 
- useEffect(() => {
-  if (search.trim() === "") {
-    setData([]);
-    return;
-  }
+  useEffect(() => {
+    if (search.trim() === "") {
+      setData([]);
+      return;
+    }
 
-  const ref = setTimeout(() => {
-    getdata(search);
-  }, 500);
+    const ref = setTimeout(() => {
+      getdata(search);
+    }, 500);
 
-  return () => clearTimeout(ref); // ✅ correct cleanup
-}, [search]);
-
+    return () => clearTimeout(ref); // ✅ correct cleanup
+  }, [search]);
 
   return (
-    <div className="w-[500px] flex flex-col gap-5 border">
+    <div className="w-[500px] flex flex-col rounded-full">
       <div>
         <input
+        placeholder="search your fav dish..."
+          className="w-full py-2 px-6 bg-slate-100 rounded-full"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           type="text"
