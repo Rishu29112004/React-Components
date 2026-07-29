@@ -1,103 +1,59 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 const Pagination = () => {
-  const page = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  const [foodData, setFoodData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
 
-  const foodData = [
-    {
-      id: 1,
-      name: "Burger",
-      image: "https://cdn.dummyjson.com/recipe-images/1.webp",
-      rating: 4.8,
-    },
-    {
-      id: 2,
-      name: "Pizza",
-      image: "https://cdn.dummyjson.com/recipe-images/2.webp",
-      rating: 4.7,
-    },
-    {
-      id: 3,
-      name: "Pasta",
-      image: "https://cdn.dummyjson.com/recipe-images/3.webp",
-      rating: 4.5,
-    },
-    {
-      id: 4,
-      name: "Sandwich",
-      image: "https://cdn.dummyjson.com/recipe-images/4.webp",
-      rating: 4.4,
-    },
-    {
-      id: 5,
-      name: "Salad",
-      image: "https://cdn.dummyjson.com/recipe-images/5.webp",
-      rating: 4.2,
-    },
-    {
-      id: 6,
-      name: "Tacos",
-      image: "https://cdn.dummyjson.com/recipe-images/6.webp",
-      rating: 4.6,
-    },
-    {
-      id: 7,
-      name: "Chicken Curry",
-      image: "https://cdn.dummyjson.com/recipe-images/7.webp",
-      rating: 4.9,
-    },
-    {
-      id: 8,
-      name: "Chocolate Cake",
-      image: "https://cdn.dummyjson.com/recipe-images/8.webp",
-      rating: 4.8,
-    },
-    {
-      id: 9,
-      name: "Paneer Tikka",
-      image: "https://cdn.dummyjson.com/recipe-images/9.webp",
-      rating: 4.7,
-    },
-    {
-      id: 10,
-      name: "Fried Rice",
-      image: "https://cdn.dummyjson.com/recipe-images/10.webp",
-      rating: 4.5,
-    },
-    {
-      id: 11,
-      name: "Momos",
-      image: "https://cdn.dummyjson.com/recipe-images/11.webp",
-      rating: 4.6,
-    },
-    {
-      id: 12,
-      name: "Ice Cream",
-      image: "https://cdn.dummyjson.com/recipe-images/12.webp",
-      rating: 4.4,
-    },
-  ];
+  const lastIndex = currentPage * itemsPerPage;
+  const firstIndex = lastIndex - itemsPerPage;
+
+  const currentData = foodData.slice(firstIndex, lastIndex);
+
+  const totalPages = Math.ceil(foodData.length / itemsPerPage);
+  const pages = [...Array(totalPages)].map((_, i) => i + 1);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+  async function fetchData() {
+    try {
+      const response = await fetch("https://dummyjson.com/recipes?limit=50");
+      console.log(response);
+      const data = await response.json();
+      setFoodData(data.recipes);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
     <div className="flex items-center flex-col min-h-screen w-full bg-gray-900">
       <div className="flex items-center p-4 gap-5 bg-slate-900 justify-between">
-        <button className="border px-4 rounded-md py-2 bg-gradient-to-r from-blue-600 via-blue-500 to-teal-400  flex items-center justify-between text-white border-white">
+        <button
+          onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+          className="border px-4 rounded-md py-2 bg-gradient-to-r from-blue-600 via-blue-500 to-teal-400  flex items-center justify-between text-white border-white"
+        >
           ⬅
         </button>
-        {page.map((t) => (
+        {pages.map((t) => (
           <div
             key={t}
+            onClick={() => setCurrentPage(t)}
             className="border px-4 rounded-md py-2 bg-gradient-to-r from-blue-600 via-blue-500 to-teal-400  flex items-center justify-between text-white border-white"
           >
             <p>{t}</p>
           </div>
         ))}
-        <button className="border px-4 rounded-md py-2 bg-gradient-to-r from-blue-600 via-blue-500 to-teal-400  flex items-center justify-between text-white border-white">
+        <button
+          onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+          className="border px-4 rounded-md py-2 bg-gradient-to-r from-blue-600 via-blue-500 to-teal-400  flex items-center justify-between text-white border-white"
+        >
           ➡
         </button>
-        <div></div>
       </div>
-      <div className="bg-slate-300 grid grid-cols-4 w-full items-center justify-between">
-        {foodData.map((t) => (
+      <div className="bg-slate-300 grid grid-cols-4 h-[500px] overflow-y-scroll">
+        {currentData.map((t) => (
           <div key={t.id} className="border p-4 rounded-md flex flex-col gap-3">
             <img
               src={t.image}
@@ -105,7 +61,7 @@ const Pagination = () => {
               className="w-full h-40 object-cover rounded-md"
             />
             <p className="font-bold text-red-500">{t.name}</p>
-            <p className="font-bold text-yellow-500">{t.rating}</p>
+            <p className="font-bold text-yellow-500">⭐ {t.rating}</p>
           </div>
         ))}
       </div>
